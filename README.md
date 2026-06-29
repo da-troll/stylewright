@@ -84,14 +84,24 @@ You can keep several configs side by side and select one per run with
 ## Layout
 
 ```
-bin/stylewright.mjs        CLI dispatcher
-src/config.mjs             config load + validation
-src/init.mjs               vendor template + lib
-src/inspect.mjs            live-DOM var/selector dump + baseline screenshot
-src/compile.mjs            Less → CSS (+ @-moz-document unwrap for injection)
-src/preview.mjs            compile + inject + screenshot per variant
-src/browser.mjs            Playwright launch/context helper
-stylewright.config.json    the swappable style-source definition
-style-source/              vendored template + lib   (gitignored, from `init`)
-work/<site>/               per-site output            (gitignored)
+stylewright/
+├── bin/
+│   └── stylewright.mjs        CLI dispatcher
+├── src/
+│   ├── config.mjs             config load + validation
+│   ├── init.mjs               vendor template + lib
+│   ├── inspect.mjs            live-DOM var/selector dump + baseline screenshot
+│   ├── compile.mjs            Less → CSS (+ @-moz-document unwrap for injection)
+│   ├── preview.mjs            compile + inject + screenshot per variant
+│   └── browser.mjs            Playwright launch/context helper
+├── stylewright.config.json    the swappable style-source definition
+├── style-source/              vendored template + lib   (gitignored, from `init`)
+│   ├── template.user.less
+│   └── lib.less
+└── work/                      per-site output           (gitignored)
+    └── <site-slug>/
+        ├── inspect.json       dumped CSS vars, selectors, theme attrs
+        ├── baseline-*.png     un-themed screenshot
+        ├── style.user.less    the style you author (deliverable)
+        └── preview-*.png      themed screenshot per verify variant
 ```
