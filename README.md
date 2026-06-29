@@ -1,22 +1,38 @@
 # stylewright
 
-Generate browser **userstyles** (themes) for any website using a single Claude
-Code instance — no division of labor. One agent inspects the live site, writes the
-style, compiles it, injects it into a real browser, screenshots the result, and
-iterates until it looks right. [Catppuccin](https://github.com/catppuccin/userstyles)
-is the default style source, but it's fully swappable.
+Generate browser **userstyles** (themes) for any website with a single Claude Code
+instance. It drives a real browser to inspect the live site, compiles the style,
+injects it, and screenshots the result — so the agent sees its own work and
+iterates against the rendered page instead of guessing at static markup.
 
-The harness gives the model **eyes and hands** (Playwright + a Less compiler); the
-model supplies the brain (reading the live DOM, mapping colors, critiquing
-screenshots). That closes the loop an LLM normally can't do alone — see
-[CLAUDE.md](./CLAUDE.md) for the operating loop.
+[Catppuccin](https://github.com/catppuccin/userstyles) is the default style source;
+swap it for any other via [`stylewright.config.json`](#using-a-different-style-source).
+The agent loop lives in [CLAUDE.md](./CLAUDE.md).
 
-## Why not just "save the page + ask an LLM"?
+## Layout
 
-A saved page is a dead snapshot — it loses CSS-in-JS, hover/focus states, modals,
-shadow DOM, and logged-in views, and the LLM is blind to the rendered result.
-stylewright works against the **live, rendered** site and feeds the model its own
-screenshots, turning a blind one-shot into sighted iteration.
+```
+stylewright/
+├── bin/
+│   └── stylewright.mjs        CLI dispatcher
+├── src/
+│   ├── config.mjs             config load + validation
+│   ├── init.mjs               vendor template + lib
+│   ├── inspect.mjs            live-DOM var/selector dump + baseline screenshot
+│   ├── compile.mjs            Less → CSS (+ @-moz-document unwrap for injection)
+│   ├── preview.mjs            compile + inject + screenshot per variant
+│   └── browser.mjs            Playwright launch/context helper
+├── stylewright.config.json    the swappable style-source definition
+├── style-source/              vendored template + lib   (gitignored, from `init`)
+│   ├── template.user.less
+│   └── lib.less
+└── work/                      per-site output           (gitignored)
+    └── <site-slug>/
+        ├── inspect.json       dumped CSS vars, selectors, theme attrs
+        ├── baseline-*.png     un-themed screenshot
+        ├── style.user.less    the style you author (deliverable)
+        └── preview-*.png      themed screenshot per verify variant
+```
 
 ## Setup
 
@@ -80,28 +96,3 @@ You can keep several configs side by side and select one per run with
 > Note: the compiler is currently Less-only (matching Catppuccin). A different
 > preprocessor (Stylus, SCSS) is a compiler branch in `src/compile.mjs`; the
 > config validation fails loud until that branch exists.
-
-## Layout
-
-```
-stylewright/
-├── bin/
-│   └── stylewright.mjs        CLI dispatcher
-├── src/
-│   ├── config.mjs             config load + validation
-│   ├── init.mjs               vendor template + lib
-│   ├── inspect.mjs            live-DOM var/selector dump + baseline screenshot
-│   ├── compile.mjs            Less → CSS (+ @-moz-document unwrap for injection)
-│   ├── preview.mjs            compile + inject + screenshot per variant
-│   └── browser.mjs            Playwright launch/context helper
-├── stylewright.config.json    the swappable style-source definition
-├── style-source/              vendored template + lib   (gitignored, from `init`)
-│   ├── template.user.less
-│   └── lib.less
-└── work/                      per-site output           (gitignored)
-    └── <site-slug>/
-        ├── inspect.json       dumped CSS vars, selectors, theme attrs
-        ├── baseline-*.png     un-themed screenshot
-        ├── style.user.less    the style you author (deliverable)
-        └── preview-*.png      themed screenshot per verify variant
-```
