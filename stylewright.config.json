@@ -1,0 +1,64 @@
+{
+  "_comment": "Swap the entire `styleSource` block to target a different style repo (see README → 'Using a different style source'). The harness logic never hardcodes Catppuccin — everything style-specific lives here.",
+
+  "styleSource": {
+    "id": "catppuccin",
+    "repo": "catppuccin/userstyles",
+    "preprocessor": "less",
+    "outputExtension": ".user.less",
+
+    "vendor": {
+      "templateUrl": "https://raw.githubusercontent.com/catppuccin/userstyles/main/template/catppuccin.user.less",
+      "libUrl": "https://userstyles.catppuccin.com/lib/lib.less",
+      "templateFile": "template.user.less",
+      "libFile": "lib.less",
+      "rewriteImport": {
+        "from": "https://userstyles.catppuccin.com/lib/lib.less",
+        "to": "lib.less"
+      }
+    },
+
+    "variants": {
+      "vars": {
+        "lightFlavor": { "default": "latte", "options": ["latte", "frappe", "macchiato", "mocha"] },
+        "darkFlavor":  { "default": "mocha", "options": ["latte", "frappe", "macchiato", "mocha"] },
+        "accentColor": { "default": "mauve", "options": ["rosewater", "flamingo", "pink", "mauve", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "sapphire", "blue", "lavender", "subtext0"] }
+      },
+      "verify": [
+        { "label": "mocha-dark", "colorScheme": "dark",  "vars": { "darkFlavor": "mocha",  "accentColor": "mauve" } },
+        { "label": "latte-light", "colorScheme": "light", "vars": { "lightFlavor": "latte", "accentColor": "mauve" } }
+      ]
+    },
+
+    "palette": {
+      "names": ["rosewater", "flamingo", "pink", "mauve", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "sapphire", "blue", "lavender", "text", "subtext1", "subtext0", "overlay2", "overlay1", "overlay0", "surface2", "surface1", "surface0", "base", "mantle", "crust"],
+      "roleHints": {
+        "page-background": ["base", "mantle", "crust"],
+        "raised-surface": ["surface0", "surface1", "surface2"],
+        "muted-decoration": ["overlay0", "overlay1", "overlay2"],
+        "body-text": ["text"],
+        "secondary-text": ["subtext0", "subtext1"],
+        "disabled-placeholder": ["overlay0", "overlay1"],
+        "interactive-accent": ["accent", "mauve", "blue", "sapphire", "lavender"],
+        "success": ["green", "teal"],
+        "warning": ["yellow", "peach"],
+        "error": ["red", "maroon"]
+      }
+    }
+  },
+
+  "browser": {
+    "channel": "chrome",
+    "headed": true,
+    "viewport": { "width": 1440, "height": 900 },
+    "deviceScaleFactor": 1,
+    "storageStatePath": null,
+    "navigationTimeoutMs": 45000,
+    "settleMs": 1500
+  },
+
+  "iteration": {
+    "maxRounds": 8,
+    "screenshotFullPage": true
+  }
+}

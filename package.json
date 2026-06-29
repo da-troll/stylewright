@@ -1,0 +1,21 @@
+{
+  "name": "stylewright",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Single-instance Claude Code harness for generating browser userstyles (themes) for any site, against any swappable style source (Catppuccin by default).",
+  "bin": {
+    "stylewright": "bin/stylewright.mjs"
+  },
+  "scripts": {
+    "init": "node bin/stylewright.mjs init",
+    "postinstall-browser": "playwright install chromium"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "less": "^4.2.0",
+    "playwright": "^1.48.0"
+  }
+}
