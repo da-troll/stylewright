@@ -48,24 +48,24 @@ node bin/stylewright.mjs init          # vendor the template + palette lib
 ## Usage
 
 ```bash
-# 1. inspect the live site → work/<site>/inspect.json + baseline screenshot
-#    (<site> = the URL host, e.g. www.booking.com — inspect prints the exact dir)
-node bin/stylewright.mjs inspect <url> --scheme dark
+# 1. inspect the live site → dumps vars/selectors + a baseline screenshot
+node bin/stylewright.mjs inspect https://www.booking.com --scheme dark
+#    → creates work/www.booking.com/   (folder = URL host; printed in the output)
 
 # 2. start your style from the template, then edit it (see below)
-cp style-source/template.user.less work/<site>/style.user.less
+cp style-source/template.user.less work/www.booking.com/style.user.less
 
 # 3. compile + inject + screenshot each flavor variant
-node bin/stylewright.mjs preview <url> work/<site>/style.user.less
+node bin/stylewright.mjs preview https://www.booking.com work/www.booking.com/style.user.less
 
-# 4. look at work/<site>/preview-*.png, fix, repeat
+# 4. look at work/www.booking.com/preview-*.png, fix, repeat
 
 # 5. compile a flat CSS build if you want one
-node bin/stylewright.mjs compile work/<site>/style.user.less --var darkFlavor=mocha --out out.css
+node bin/stylewright.mjs compile work/www.booking.com/style.user.less --var darkFlavor=mocha --out out.css
 ```
 
 Step 2 is the authoring step — no CLI involved. Edit the copied file: set
-`@-moz-document domain("<site>")`, fill the metadata block, pick one light/dark
+`@-moz-document domain("booking.com")`, fill the metadata block, pick one light/dark
 strategy, and map the site's colors to palette roles using `inspect.json`.
 Details in [CLAUDE.md](./CLAUDE.md), "The loop" step 2.
 
