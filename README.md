@@ -50,13 +50,13 @@ node bin/stylewright.mjs init          # vendor the template + palette lib
 ```bash
 # 1. inspect the live site → work/<site>/inspect.json + baseline screenshot
 #    (<site> = the URL host, e.g. www.booking.com — inspect prints the exact dir)
-node bin/stylewright.mjs inspect https://example.com --scheme dark
+node bin/stylewright.mjs inspect <url> --scheme dark
 
 # 2. start your style from the template, then edit it (see below)
 cp style-source/template.user.less work/<site>/style.user.less
 
 # 3. compile + inject + screenshot each flavor variant
-node bin/stylewright.mjs preview https://example.com work/<site>/style.user.less
+node bin/stylewright.mjs preview <url> work/<site>/style.user.less
 
 # 4. look at work/<site>/preview-*.png, fix, repeat
 
