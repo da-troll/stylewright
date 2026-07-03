@@ -7,7 +7,10 @@ iterates against the rendered page instead of guessing at static markup.
 
 [Catppuccin](https://github.com/catppuccin/userstyles) is the default style source;
 swap it for any other via [`stylewright.config.json`](#using-a-different-style-source).
-The agent loop lives in [CLAUDE.md](./CLAUDE.md).
+The agent loop lives in [CLAUDE.md](./CLAUDE.md) — the intended way to use this
+repo is to open a Claude Code session inside it and say "theme <url>"; the agent
+runs the whole inspect → author → preview → iterate loop itself. The Usage steps
+below are that same loop broken out for running by hand.
 
 ## Layout
 
@@ -48,7 +51,13 @@ node bin/stylewright.mjs init          # vendor the template + palette lib
 # 1. inspect the live site → work/<site>/inspect.json + baseline screenshot
 node bin/stylewright.mjs inspect https://example.com --scheme dark
 
-# 2. author work/<site>/style.user.less (start from style-source/template.user.less)
+# 2. author the style — NOT a CLI command, this is the editing step you (or
+#    Claude) do by hand. Copy the vendored template into the site's work dir:
+cp style-source/template.user.less work/<site>/style.user.less
+#    …then edit that file: set @-moz-document domain("<site>"), fill the
+#    metadata block, pick ONE light/dark strategy, and map the site's colors
+#    to palette roles using work/<site>/inspect.json as your map.
+#    Full authoring guidance lives in CLAUDE.md ("The loop", step 2).
 
 # 3. compile + inject + screenshot each flavor variant
 node bin/stylewright.mjs preview https://example.com work/<site>/style.user.less
