@@ -51,13 +51,8 @@ node bin/stylewright.mjs init          # vendor the template + palette lib
 # 1. inspect the live site → work/<site>/inspect.json + baseline screenshot
 node bin/stylewright.mjs inspect https://example.com --scheme dark
 
-# 2. author the style — NOT a CLI command, this is the editing step you (or
-#    Claude) do by hand. Copy the vendored template into the site's work dir:
+# 2. start your style from the template, then edit it (see below)
 cp style-source/template.user.less work/<site>/style.user.less
-#    …then edit that file: set @-moz-document domain("<site>"), fill the
-#    metadata block, pick ONE light/dark strategy, and map the site's colors
-#    to palette roles using work/<site>/inspect.json as your map.
-#    Full authoring guidance lives in CLAUDE.md ("The loop", step 2).
 
 # 3. compile + inject + screenshot each flavor variant
 node bin/stylewright.mjs preview https://example.com work/<site>/style.user.less
@@ -67,6 +62,11 @@ node bin/stylewright.mjs preview https://example.com work/<site>/style.user.less
 # 5. compile a flat CSS build if you want one
 node bin/stylewright.mjs compile work/<site>/style.user.less --var darkFlavor=mocha --out out.css
 ```
+
+Step 2 is the authoring step — no CLI involved. Edit the copied file: set
+`@-moz-document domain("<site>")`, fill the metadata block, pick one light/dark
+strategy, and map the site's colors to palette roles using `inspect.json`.
+Details in [CLAUDE.md](./CLAUDE.md), "The loop" step 2.
 
 For logged-in sites, export a Playwright `storageState` once and pass
 `--storage session.storage.json` to `inspect`/`preview`.
