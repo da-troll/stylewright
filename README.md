@@ -49,6 +49,7 @@ node bin/stylewright.mjs init          # vendor the template + palette lib
 
 ```bash
 # 1. inspect the live site → work/<site>/inspect.json + baseline screenshot
+#    (<site> = the URL host, e.g. www.booking.com — inspect prints the exact dir)
 node bin/stylewright.mjs inspect https://example.com --scheme dark
 
 # 2. start your style from the template, then edit it (see below)
