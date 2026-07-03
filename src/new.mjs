@@ -40,40 +40,46 @@ export async function newStyle(cfg, url, opts = {}) {
     subs++;
   }
 
-  // Check for auto-generated variable mappings
+  // Auto-mapped variable remap from inspect.json (when present) — the site's
+  // own color vars translated to palette roles. See src/automap.mjs.
   const inspectPath = path.join(outDir, "inspect.json");
-  let autoMappings = null;
+  let automap = null;
   if (existsSync(inspectPath)) {
     const { generateAutoMapping } = await import("./automap.mjs");
-    autoMappings = await generateAutoMapping(inspectPath);
+    automap = await generateAutoMapping(cfg, inspectPath);
   }
 
-  // 2. Starter rules or auto-generated mappings at the authoring marker — makes
-  //    the first preview visibly themed instead of a silent no-op.
+  // 2. Seed at the authoring marker — auto-mapped remap when available, plus
+  //    the config starter rules either way, so the first preview is never a
+  //    silent no-op.
   let seeded = false;
   const marker = ss.vendor.startMarker;
   if (marker && text.includes(marker)) {
     const indent = (text.split(marker)[0].match(/([ \t]*)$/) || [, ""])[1];
-    let rules = "";
-    if (autoMappings) {
-      rules = `${indent}&, body, [data-theme], [data-bui-theme], [class*="theme-"] {\n` +
-              `${autoMappings}\n` +
-              `${indent}}\n\n` +
-              `${indent}body {\n` +
-              `${indent}  background-color: @base !important;\n` +
-              `${indent}  color: @text !important;\n` +
-              `${indent}}\n` +
-              `${indent}a {\n` +
-              `${indent}  color: @accent !important;\n` +
-              `${indent}}`;
-    } else if (ss.vendor.starterRules?.length) {
-      rules = ss.vendor.starterRules.map((r) => indent + r).join("\n");
+    const parts = [];
+    if (automap) {
+      // Scope selectors come from config: `&` (the mixin invocation point,
+      // :root under the scheme media queries) + body + the common theme-
+      // wrapper attributes. Sites like booking.com re-declare their vars on
+      // an attributed wrapper INSIDE body — without re-overriding at that
+      // wrapper, inheritance from the nearest ancestor wins and the remap
+      // never reaches the page.
+      const scope = (ss.automap?.scopeSelectors || ["&", "body"]).join(", ");
+      parts.push(
+        `${indent}${scope} {\n` +
+          automap.rules.map((r) => `${indent}  ${r}`).join("\n") +
+          `\n${indent}}`,
+      );
+    }
+    if (ss.vendor.starterRules?.length) {
+      parts.push(ss.vendor.starterRules.map((r) => indent + r).join("\n"));
     }
 
-    if (rules) {
+    if (parts.length) {
+      const rules = parts.join("\n\n");
       text = text.replace(marker, `${marker}\n${rules}`);
       // Drop the template's bare example declaration if present right after the
-      // marker (the starter rules supersede it).
+      // marker (the seeded rules supersede it).
       text = text.replace(`${rules}\n${indent}background-color: @base;`, rules);
       seeded = true;
     }
@@ -82,7 +88,14 @@ export async function newStyle(cfg, url, opts = {}) {
   await writeFile(outFile, text);
   console.log(`[new] ${relRoot(cfg, outFile)}`);
   console.log(`[new]   placeholders filled: ${subs} (domain → ${domain})`);
-  console.log(`[new]   starter rules: ${seeded ? (autoMappings ? "auto-mapped from inspect.json" : "seeded from config") : "marker not found, seed by hand"}`);
+  console.log(`[new]   starter rules: ${seeded ? "seeded from config" : "marker not found, seed by hand"}`);
+  if (automap) {
+    console.log(`[new]   automap: ${automap.rules.length} site vars → palette roles`);
+    if (automap.skipped.length) {
+      const sample = automap.skipped.slice(0, 6).join(", ");
+      console.log(`[new]   automap skipped ${automap.skipped.length} color vars (ambiguous/non-solid): ${sample}${automap.skipped.length > 6 ? ", …" : ""}`);
+    }
+  }
 
   // Strategy hint from inspect.json when available.
   if (existsSync(inspectPath)) {

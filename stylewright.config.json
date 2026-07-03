@@ -160,6 +160,77 @@
           "maroon"
         ]
       }
+    },
+    "automap": {
+      "_comment": "name\u2192role table for automap (src/automap.mjs). Patterns are case-insensitive regexes matched against the var name after stripPrefix; first hit wins. 'skip' marks direction-ambiguous names (a site's 'white' means opposite things in latte vs mocha) and non-solid uses (shadows/overlays) \u2014 reported, never guessed. Convention note: only on_* is treated as contrast-on-color; X_foreground maps to the X role itself (bui convention: action_foreground = the blue used AS text). shadcn-style *-foreground vars carry bare HSL-triple values and fail the value gate, so the collision doesn't arise.",
+      "stripPrefix": "^(bui_|ui_|theme_|color[-_])",
+      "skip": [
+        "(^|[-_])(white|black|gr[ae]y|blue|purple|violet|indigo|pink|teal|cyan|red|green|yellow|orange|transparent)([-_]|$|[0-9])",
+        "shadow|overlay|backdrop|scrim|gradient|photo|image"
+      ],
+      "roles": [
+        {
+          "match": "(^|[-_])on[-_]",
+          "role": "@crust"
+        },
+        {
+          "match": "invert|inverse",
+          "role": "@crust"
+        },
+        {
+          "match": "success|constructive|confirm|positive|(^|[-_])ok([-_]|$)",
+          "role": "@green"
+        },
+        {
+          "match": "warning|caution|attention",
+          "role": "@yellow"
+        },
+        {
+          "match": "error|danger|destructive|negative|critical",
+          "role": "@red"
+        },
+        {
+          "match": "(^|[-_])info",
+          "role": "@blue"
+        },
+        {
+          "match": "accent|primary|brand|link|cta|action|highlight|selected|focus|active",
+          "role": "@accent"
+        },
+        {
+          "match": "inset|sunken|mantle|crust|(bg|background)[-_]?(alt|secondary)|secondary[-_]?(bg|background)",
+          "role": "@mantle"
+        },
+        {
+          "match": "card|paper|raised|surface|elevat|tile|panel|modal|popover|tooltip[-_]?(bg|background)",
+          "role": "@surface0"
+        },
+        {
+          "match": "(^|[-_])(bg|background|canvas|window|page)",
+          "role": "@base"
+        },
+        {
+          "match": "border|divider|separator|stroke|outline",
+          "role": "@surface2"
+        },
+        {
+          "match": "muted|hint|placeholder|disabled|subtext|tertiary|secondary",
+          "role": "@subtext0"
+        },
+        {
+          "match": "text|foreground|(^|[-_])fg([-_]|$)|heading|title|caption|icon",
+          "role": "@text"
+        }
+      ],
+      "scopeSelectors": [
+        "&",
+        "body",
+        "[data-theme]",
+        "[data-bui-theme]",
+        "[data-color-mode]",
+        "[data-mode]",
+        "[class*=\"theme\" i]"
+      ]
     }
   },
   "browser": {
