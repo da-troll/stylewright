@@ -40,27 +40,51 @@ export async function newStyle(cfg, url, opts = {}) {
     subs++;
   }
 
-  // 2. Starter rules at the authoring marker — makes the first preview
-  //    visibly themed instead of a silent no-op.
+  // Check for auto-generated variable mappings
+  const inspectPath = path.join(outDir, "inspect.json");
+  let autoMappings = null;
+  if (existsSync(inspectPath)) {
+    const { generateAutoMapping } = await import("./automap.mjs");
+    autoMappings = await generateAutoMapping(inspectPath);
+  }
+
+  // 2. Starter rules or auto-generated mappings at the authoring marker — makes
+  //    the first preview visibly themed instead of a silent no-op.
   let seeded = false;
   const marker = ss.vendor.startMarker;
-  if (marker && ss.vendor.starterRules?.length && text.includes(marker)) {
+  if (marker && text.includes(marker)) {
     const indent = (text.split(marker)[0].match(/([ \t]*)$/) || [, ""])[1];
-    const rules = ss.vendor.starterRules.map((r) => indent + r).join("\n");
-    text = text.replace(marker, `${marker}\n${rules}`);
-    // Drop the template's bare example declaration if present right after the
-    // marker (the starter rules supersede it).
-    text = text.replace(`${rules}\n${indent}background-color: @base;`, rules);
-    seeded = true;
+    let rules = "";
+    if (autoMappings) {
+      rules = `${indent}&, body, [data-theme], [data-bui-theme], [class*="theme-"] {\n` +
+              `${autoMappings}\n` +
+              `${indent}}\n\n` +
+              `${indent}body {\n` +
+              `${indent}  background-color: @base !important;\n` +
+              `${indent}  color: @text !important;\n` +
+              `${indent}}\n` +
+              `${indent}a {\n` +
+              `${indent}  color: @accent !important;\n` +
+              `${indent}}`;
+    } else if (ss.vendor.starterRules?.length) {
+      rules = ss.vendor.starterRules.map((r) => indent + r).join("\n");
+    }
+
+    if (rules) {
+      text = text.replace(marker, `${marker}\n${rules}`);
+      // Drop the template's bare example declaration if present right after the
+      // marker (the starter rules supersede it).
+      text = text.replace(`${rules}\n${indent}background-color: @base;`, rules);
+      seeded = true;
+    }
   }
 
   await writeFile(outFile, text);
   console.log(`[new] ${relRoot(cfg, outFile)}`);
   console.log(`[new]   placeholders filled: ${subs} (domain → ${domain})`);
-  console.log(`[new]   starter rules: ${seeded ? "seeded — first preview will visibly apply the palette" : "marker not found, seed by hand"}`);
+  console.log(`[new]   starter rules: ${seeded ? (autoMappings ? "auto-mapped from inspect.json" : "seeded from config") : "marker not found, seed by hand"}`);
 
   // Strategy hint from inspect.json when available.
-  const inspectPath = path.join(outDir, "inspect.json");
   if (existsSync(inspectPath)) {
     try {
       const insp = JSON.parse(await readFile(inspectPath, "utf8"));
