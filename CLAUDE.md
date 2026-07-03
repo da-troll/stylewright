@@ -35,13 +35,13 @@ Target site: the URL the user gives you. Work happens under `work/<site-slug>/`.
    - `topClasses` — real selectors to target when there are no theme vars.
    - View `baseline-*.png` to see the un-themed starting point.
 
-2. **Write the style.** Copy the vendored template as your starting point:
+2. **Write the style.** Scaffold from the vendored template:
    ```bash
-   cp style-source/template.user.less work/<site>/style.user.less
+   node bin/stylewright.mjs new <url>
    ```
-   Then edit it:
-   - Set `@-moz-document domain("<the-site-domain>")`.
-   - Fill the `@name`, `@namespace`, `@homepageURL`, `@description` metadata.
+   This fills the domain + metadata placeholders and seeds visible starter rules
+   (so your first preview proves the pipeline). Then edit the file:
+   - Replace the starter rules with the site's real selectors.
    - Pick ONE light/dark strategy and delete the other (see template comments):
      `prefers-color-scheme` if the site has no toggle, or target its theme
      attribute (e.g. `:root[data-theme="dark"]`) if it does.

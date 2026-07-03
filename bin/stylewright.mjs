@@ -2,6 +2,7 @@
 import { loadConfig } from "../src/config.mjs";
 import { init } from "../src/init.mjs";
 import { inspect } from "../src/inspect.mjs";
+import { newStyle } from "../src/new.mjs";
 import { preview } from "../src/preview.mjs";
 import { compile } from "../src/compile.mjs";
 import { writeFile } from "node:fs/promises";
@@ -15,6 +16,10 @@ USAGE
   stylewright inspect <url> [--scheme dark|light] [--storage <file>]
       Load the LIVE site; dump CSS custom props, selectors, baseline screenshot
       → work/<site>/inspect.json + baseline-*.png
+
+  stylewright new <url> [--force]
+      Scaffold work/<site>/style.user.less from the vendored template with the
+      domain + metadata placeholders filled and visible starter rules seeded.
 
   stylewright preview <url> <style.user.less> [--label <variant>] [--storage <file>]
       Compile the style, inject into the live site, screenshot each verify variant
@@ -72,6 +77,13 @@ async function main() {
         colorScheme: flags.scheme,
         storageStatePath: flags.storage,
       });
+      break;
+    }
+
+    case "new": {
+      const url = positional[0];
+      if (!url) die("new needs a <url>");
+      await newStyle(cfg, url, { force: !!flags.force });
       break;
     }
 

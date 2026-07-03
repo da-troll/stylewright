@@ -52,8 +52,8 @@ node bin/stylewright.mjs init          # vendor the template + palette lib
 node bin/stylewright.mjs inspect https://www.booking.com --scheme dark
 #    → creates work/www.booking.com/   (folder = URL host; printed in the output)
 
-# 2. start your style from the template, then edit it (see below)
-cp style-source/template.user.less work/www.booking.com/style.user.less
+# 2. scaffold your style — fills the domain + metadata, seeds visible starter rules
+node bin/stylewright.mjs new https://www.booking.com
 
 # 3. compile + inject + screenshot each flavor variant
 node bin/stylewright.mjs preview https://www.booking.com work/www.booking.com/style.user.less
@@ -64,10 +64,11 @@ node bin/stylewright.mjs preview https://www.booking.com work/www.booking.com/st
 node bin/stylewright.mjs compile work/www.booking.com/style.user.less --var darkFlavor=mocha --out out.css
 ```
 
-Step 2 is the authoring step — no CLI involved. Edit the copied file: set
-`@-moz-document domain("booking.com")`, fill the metadata block, pick one light/dark
-strategy, and map the site's colors to palette roles using `inspect.json`.
-Details in [CLAUDE.md](./CLAUDE.md), "The loop" step 2.
+`new` writes `work/www.booking.com/style.user.less` ready to preview — the seeded
+starter rules make the first screenshots visibly themed so you know the pipeline
+works. The real authoring is replacing those with the site's actual selectors,
+mapped to palette roles via `inspect.json` (guidance: [CLAUDE.md](./CLAUDE.md),
+"The loop" step 2).
 
 For logged-in sites, export a Playwright `storageState` once and pass
 `--storage session.storage.json` to `inspect`/`preview`.
